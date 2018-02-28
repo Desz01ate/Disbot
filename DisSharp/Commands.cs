@@ -41,7 +41,8 @@ namespace DisSharp
 
 !random {min} {max} : เล่นสุ่มเลขกันหน่อยป่าว （´ヘ｀；）
                 ";
-            await ctx.RespondAsync(helpText);
+            var dm = await ctx.Client.CreateDmAsync(ctx.User);
+            await dm.SendMessageAsync(helpText);
         }
         [Command("setboss")]
         public async Task SetBoss(CommandContext ctx, string bossName)
@@ -141,6 +142,7 @@ namespace DisSharp
         {
             WriteLog(ctx);
             await ctx.RespondAsync($"👋 หวัดดี, {ctx.User.Mention}!");
+
         }
         [Command("random")]
         public async Task Random(CommandContext ctx, int min, int max)

@@ -8,3 +8,14 @@ C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.Ass
 C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.AssemblyInfo.cs
 C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.dll
 C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.pdb
+C:\GitHub\Disbot\DisSharp\bin\Debug\netcoreapp2.0\Disbot.deps.json
+C:\GitHub\Disbot\DisSharp\bin\Debug\netcoreapp2.0\Disbot.runtimeconfig.json
+C:\GitHub\Disbot\DisSharp\bin\Debug\netcoreapp2.0\Disbot.runtimeconfig.dev.json
+C:\GitHub\Disbot\DisSharp\bin\Debug\netcoreapp2.0\Disbot.dll
+C:\GitHub\Disbot\DisSharp\bin\Debug\netcoreapp2.0\Disbot.pdb
+C:\GitHub\Disbot\DisSharp\obj\Debug\netcoreapp2.0\Disbot.csprojResolveAssemblyReference.cache
+C:\GitHub\Disbot\DisSharp\obj\Debug\netcoreapp2.0\Disbot.csproj.CoreCompileInputs.cache
+C:\GitHub\Disbot\DisSharp\obj\Debug\netcoreapp2.0\Disbot.AssemblyInfoInputs.cache
+C:\GitHub\Disbot\DisSharp\obj\Debug\netcoreapp2.0\Disbot.AssemblyInfo.cs
+C:\GitHub\Disbot\DisSharp\obj\Debug\netcoreapp2.0\Disbot.dll
+C:\GitHub\Disbot\DisSharp\obj\Debug\netcoreapp2.0\Disbot.pdb

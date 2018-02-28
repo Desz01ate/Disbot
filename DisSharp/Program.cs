@@ -23,11 +23,10 @@ namespace DisSharp
     {
         static DiscordClient discord;
         static CommandsNextModule commands;
-        static BotConfig botConfig;
         static List<DiscordUserStamp> loggedInUser = new List<DiscordUserStamp>();
+        static List<DiscordMessage> waitForDeleteMessage = new List<DiscordMessage>();
         static void Main(string[] args)
         {
-            botConfig = JsonConvert.DeserializeObject<BotConfig>(File.ReadAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/config.json"));
             if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/"))
             {
                 Directory.CreateDirectory($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/");
@@ -49,10 +48,10 @@ namespace DisSharp
         {
             discord = new DiscordClient(new DiscordConfiguration
             {
-                Token = botConfig.Token,
+                Token = BotConfig.GetContext.Token,
                 TokenType = TokenType.Bot,
                 UseInternalLogHandler = true,
-                LogLevel = botConfig.DebugMode,
+                LogLevel = BotConfig.GetContext.DebugMode,
 
             });
             try
@@ -64,6 +63,7 @@ namespace DisSharp
             discord.VoiceStateUpdated += VoiceStateUpdatedEvent;
             discord.Ready += GetReady;
             discord.Heartbeated += HeartBeatedEvent;
+            discord.MessageCreated += MessageCreateEvent;
             commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefix = "!"
@@ -73,9 +73,20 @@ namespace DisSharp
             await Task.Delay(-1);
         }
 
+        private static async Task MessageCreateEvent(MessageCreateEventArgs e)
+        {
+            var creator = e.Author;
+            if (creator == discord.CurrentUser)
+            {
+                waitForDeleteMessage.Add(e.Message);
+            }
+                
+            await Task.Delay(1);
+        }
+
         private static async Task VoiceStateUpdatedEvent(VoiceStateUpdateEventArgs e)
         {
-            var ch = await discord.GetChannelAsync(botConfig.TextChanneID);
+            var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChanneID);
             if (e.Channel.Name == ch.Guild.Channels[4].Name && !loggedInUser.Exists(x => { return x.user == e.User && DateTime.Now.Date == x.stamp.Date; }))
             {
                 await ch.SendMessageAsync($@"ยินดีต้อนรับกลับสู่ {ch.Guild.Channels[4].Name}, {e.User.Mention}!");
@@ -85,7 +96,7 @@ namespace DisSharp
 
         private static async Task GetReady(ReadyEventArgs e)
         {
-            var ch = await discord.GetChannelAsync(botConfig.TextChanneID);
+            var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChanneID);
             await ch.SendMessageAsync($@"{discord.CurrentUser.Mention} มาแล้ว! มีคำถามสงสัย กด !gethelp ได้เลยนะจ๊ะ d(￣◇￣)b");
         }
 
@@ -106,11 +117,18 @@ namespace DisSharp
             }
             else
             {
+                var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChanneID);
+                await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
                 await discord.EditCurrentUserAsync("Kzarka [In Window]");
             }
             await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
+            // remove chat
+            waitForDeleteMessage.ForEach(async m => {
+                await m.DeleteAsync();
+                waitForDeleteMessage.Remove(m);
+            });
         }
     }
 
-   
+
 }

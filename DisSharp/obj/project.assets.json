@@ -5768,11 +5768,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "C:\\Users\\kunvu\\source\\repos\\DisSharp\\DisSharp\\Disbot.csproj",
+      "projectUniqueName": "C:\\GitHub\\Disbot\\DisSharp\\Disbot.csproj",
       "projectName": "Disbot",
-      "projectPath": "C:\\Users\\kunvu\\source\\repos\\DisSharp\\DisSharp\\Disbot.csproj",
+      "projectPath": "C:\\GitHub\\Disbot\\DisSharp\\Disbot.csproj",
       "packagesPath": "C:\\Users\\kunvu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kunvu\\source\\repos\\DisSharp\\DisSharp\\obj\\",
+      "outputPath": "C:\\GitHub\\Disbot\\DisSharp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
