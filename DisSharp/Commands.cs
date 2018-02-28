@@ -43,13 +43,6 @@ namespace DisSharp
                 ";
             await ctx.RespondAsync(helpText);
         }
-        [Command("sus")]
-        public async Task Sus(CommandContext ctx)
-        {
-
-            WriteLog(ctx);
-            await ctx.RespondAsync($"┌∩┐(◣_◢)┌∩┐ {ctx.User.Mention}");
-        }
         [Command("setboss")]
         public async Task SetBoss(CommandContext ctx, string bossName)
         {

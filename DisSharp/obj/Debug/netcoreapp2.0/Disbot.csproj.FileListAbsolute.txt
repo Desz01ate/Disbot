@@ -1,0 +1,10 @@
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\Disbot.deps.json
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\Disbot.runtimeconfig.json
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\Disbot.runtimeconfig.dev.json
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\Disbot.dll
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\Disbot.pdb
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.csproj.CoreCompileInputs.cache
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.AssemblyInfoInputs.cache
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.AssemblyInfo.cs
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.dll
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\Disbot.pdb

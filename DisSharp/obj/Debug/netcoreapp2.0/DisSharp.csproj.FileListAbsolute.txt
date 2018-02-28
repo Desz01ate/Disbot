@@ -1,0 +1,11 @@
+c:\users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\DisSharp.deps.json
+c:\users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\DisSharp.runtimeconfig.json
+c:\users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\DisSharp.runtimeconfig.dev.json
+c:\users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\DisSharp.dll
+c:\users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\DisSharp.csproj.CoreCompileInputs.cache
+c:\users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\DisSharp.AssemblyInfoInputs.cache
+c:\users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\DisSharp.AssemblyInfo.cs
+c:\users\kunvu\source\repos\DisSharp\DisSharp\bin\Debug\netcoreapp2.0\DisSharp.pdb
+c:\users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\DisSharp.dll
+c:\users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\DisSharp.pdb
+C:\Users\kunvu\source\repos\DisSharp\DisSharp\obj\Debug\netcoreapp2.0\DisSharp.csprojResolveAssemblyReference.cache
