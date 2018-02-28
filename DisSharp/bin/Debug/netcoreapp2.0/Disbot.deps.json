@@ -32,7 +32,7 @@
           "DSharpPlus": "3.2.3"
         },
         "runtime": {
-          "lib/netstandard2.0/DSharpPlus.CommandsNext.dll": {}
+          "lib/net46/DSharpPlus.CommandsNext.dll": {}
         }
       },
       "Microsoft.CSharp/4.3.0": {

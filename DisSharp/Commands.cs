@@ -62,7 +62,6 @@ namespace DisSharp
                 await ctx.RespondAsync($@"อย่ารีพอตบอสซ้ำๆ สิ เดี๋ยวแบนเลย ヾ(`ヘ´)ﾉﾞ ");
                 return;
             }
-
             // Accept report
             if (reportCouter < requiredReport && !reporterList.Contains(ctx.User.Username))
             {
@@ -100,39 +99,37 @@ namespace DisSharp
         [Command("getboss")]
         public async Task GetBoss(CommandContext ctx, string bossName)
         {
+            /*
             await ctx.RespondAsync($@"ฟังก์ชันนี้ปิดการทำงานอยู่จ้ะ รอการอัพเดทนะ (-。-;");
             return;
+            */
             //disable
             WriteLog(ctx);
             var isExtended = false;
-            var isFound = false;
-            bossList.ForEach(async boss =>
+            var ch = await ctx.Client.GetChannelAsync(BotConfig.GetContext.BotChannelID);
+            var boss = GetBossByName(bossName);
+            if (boss != null)
             {
-                if (boss.name == bossName.ToLower())
+                var spawnTime = (boss.time.AddHours(boss.window)) - DateTime.Now;
+                if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
                 {
-                    isFound = true;
-                    var spawnTime = (boss.time.AddHours(boss.window)) - DateTime.Now;
-                    if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
-                    {
-                        spawnTime = (boss.time.AddHours(boss.window).AddHours(boss.extend)) - DateTime.Now;
-                        isExtended = true;
-                    }
-                    var returnString = string.Empty;
-                    if (!isExtended)
-                    {
-                        //await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} In {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")}" });
-                        returnString = $"บอส [{boss.name.ToUpper()}] จะเกิดใน {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที ก็คือ {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")} น่ะจ้ะ ♪";
-                    }
-                    else
-                    {
-                        //await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} until {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")}" });
-                        returnString = $"บอส [{boss.name.ToUpper()}] เหลือเวลาช่วงสุ่มเกิดในอีก {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที ก็คือ {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")} น่ะจ้ะ ♪";
-                    }
-                    await ctx.RespondAsync(returnString);
-
+                    spawnTime = (boss.time.AddHours(boss.window).AddHours(boss.extend)) - DateTime.Now;
+                    isExtended = true;
                 }
-            });
-            if (!isFound)
+                var returnString = string.Empty;
+                if (!isExtended)
+                {
+                    //await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} In {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")}" });
+                    returnString = $"{ctx.User.Mention} บอส [{boss.name.ToUpper()}] จะเกิดใน {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที ก็คือ {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")} น่ะจ้ะ ♪";
+                }
+                else
+                {
+                    //await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} until {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")}" });
+                    returnString = $"{ctx.User.Mention} บอส [{boss.name.ToUpper()}] เหลือเวลาช่วงสุ่มเกิดในอีก {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที ก็คือ {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")} น่ะจ้ะ ♪";
+                }
+                await ch.SendMessageAsync(returnString);
+
+            }else
             {
                 await ctx.RespondAsync($@"หาบอสชื่อนี้ไม่เจอจ้า (-。-;");
             }

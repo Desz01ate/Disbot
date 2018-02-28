@@ -11,7 +11,8 @@ namespace DisSharp
     {
         static readonly BotConfig _botInstance = new BotConfig();
         public string Token { get;  set; }
-        public ulong TextChanneID { get;  set; }
+        public ulong TextChannelID { get;  set; }
+        public ulong BotChannelID { get; set; }
         public LogLevel DebugMode { get;  set; }
         public static BotConfig GetContext => _botInstance;
 
@@ -19,7 +20,8 @@ namespace DisSharp
         {
             var botConfig = JsonConvert.DeserializeObject<BotConfig>(File.ReadAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/config.json"));
             _botInstance.Token = botConfig.Token;
-            _botInstance.TextChanneID = botConfig.TextChanneID;
+            _botInstance.TextChannelID = botConfig.TextChannelID;
+            _botInstance.BotChannelID = botConfig.BotChannelID;
             _botInstance.DebugMode = botConfig.DebugMode;
         }
  

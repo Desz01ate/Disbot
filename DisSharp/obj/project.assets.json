@@ -24,10 +24,10 @@
           "DSharpPlus": "3.2.3"
         },
         "compile": {
-          "lib/netstandard2.0/DSharpPlus.CommandsNext.dll": {}
+          "lib/net46/DSharpPlus.CommandsNext.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/DSharpPlus.CommandsNext.dll": {}
+          "lib/net46/DSharpPlus.CommandsNext.dll": {}
         }
       },
       "Microsoft.CSharp/4.3.0": {
@@ -1701,7 +1701,6 @@
         "lib/netstandard1.1/DSharpPlus.CommandsNext.xml",
         "lib/netstandard1.3/DSharpPlus.CommandsNext.dll",
         "lib/netstandard1.3/DSharpPlus.CommandsNext.xml",
-        "lib/netstandard2.0/DSharpPlus.CommandsNext.dll",
         "lib/netstandard2.0/DSharpPlus.CommandsNext.xml"
       ]
     },
@@ -5768,11 +5767,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "C:\\GitHub\\Disbot\\DisSharp\\Disbot.csproj",
+      "projectUniqueName": "C:\\GitHub\\Disbot2\\DisSharp\\Disbot.csproj",
       "projectName": "Disbot",
-      "projectPath": "C:\\GitHub\\Disbot\\DisSharp\\Disbot.csproj",
+      "projectPath": "C:\\GitHub\\Disbot2\\DisSharp\\Disbot.csproj",
       "packagesPath": "C:\\Users\\kunvu\\.nuget\\packages\\",
-      "outputPath": "C:\\GitHub\\Disbot\\DisSharp\\obj\\",
+      "outputPath": "C:\\GitHub\\Disbot2\\DisSharp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -5823,5 +5822,17 @@
         "warn": true
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'DSharpPlus.CommandsNext 3.2.3' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.0'. This package may not be fully compatible with your project.",
+      "libraryId": "DSharpPlus.CommandsNext",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.0"
+      ]
+    }
+  ]
 }

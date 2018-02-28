@@ -25,6 +25,7 @@ namespace DisSharp
         static CommandsNextModule commands;
         static List<DiscordUserStamp> loggedInUser = new List<DiscordUserStamp>();
         static List<DiscordMessage> waitForDeleteMessage = new List<DiscordMessage>();
+        static bool isAlerted = false;
         static void Main(string[] args)
         {
             if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/"))
@@ -76,17 +77,18 @@ namespace DisSharp
         private static async Task MessageCreateEvent(MessageCreateEventArgs e)
         {
             var creator = e.Author;
-            if (creator == discord.CurrentUser)
+            var isCommand = e.Message.Content.Substring(0, 1) == "!";
+           // if (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID)
+           if (isCommand || (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID))
             {
                 waitForDeleteMessage.Add(e.Message);
-            }
-                
+            }          
             await Task.Delay(1);
         }
 
         private static async Task VoiceStateUpdatedEvent(VoiceStateUpdateEventArgs e)
         {
-            var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChanneID);
+            var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChannelID);
             if (e.Channel.Name == ch.Guild.Channels[4].Name && !loggedInUser.Exists(x => { return x.user == e.User && DateTime.Now.Date == x.stamp.Date; }))
             {
                 await ch.SendMessageAsync($@"ยินดีต้อนรับกลับสู่ {ch.Guild.Channels[4].Name}, {e.User.Mention}!");
@@ -96,7 +98,7 @@ namespace DisSharp
 
         private static async Task GetReady(ReadyEventArgs e)
         {
-            var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChanneID);
+            var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChannelID);
             await ch.SendMessageAsync($@"{discord.CurrentUser.Mention} มาแล้ว! มีคำถามสงสัย กด !gethelp ได้เลยนะจ๊ะ d(￣◇￣)b");
         }
 
@@ -114,11 +116,16 @@ namespace DisSharp
             if (!isExtended)
             {
                 await discord.EditCurrentUserAsync("Kzarka [Not In Window]");
+                isAlerted = false;
             }
             else
             {
-                var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChanneID);
-                await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
+                var ch = await discord.GetChannelAsync(BotConfig.GetContext.BotChannelID);
+                if (!isAlerted)
+                {
+                    await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
+                    isAlerted = true;
+                }
                 await discord.EditCurrentUserAsync("Kzarka [In Window]");
             }
             await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
