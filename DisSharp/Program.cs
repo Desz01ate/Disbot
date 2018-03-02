@@ -140,6 +140,7 @@ namespace DisSharp
             {
                 await m.DeleteAsync();
                 waitForDeleteMessage.Remove(m);
+                await Task.Delay(300); // 3 requests per second
             });
         }
     }

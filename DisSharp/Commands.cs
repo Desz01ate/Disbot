@@ -16,7 +16,7 @@ namespace DisSharp
     public class Commands
     {
         private static readonly int requiredReport = 2;
-        private static readonly int forceReport = 3;
+        private static readonly int forceReport = 1;
         public static List<Boss> bossList = new List<Boss>() {
             new Boss(){
                 name = "kzarka",

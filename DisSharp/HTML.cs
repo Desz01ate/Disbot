@@ -23,7 +23,7 @@ namespace Disbot
 
                 for (var i = 0; i < result.Count; i++)
                 {
-                    ResultList.Add(result[i].Groups[1].Value);
+                    ResultList.Add(result[i].Groups[1].Value); //get src group from img
                 }
             }
             catch
