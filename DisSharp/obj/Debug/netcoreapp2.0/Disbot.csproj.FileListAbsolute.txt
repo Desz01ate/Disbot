@@ -30,3 +30,5 @@ C:\GitHub\Disbot2\DisSharp\bin\Debug\netcoreapp2.0\Disbot.runtimeconfig.json
 C:\GitHub\Disbot2\DisSharp\bin\Debug\netcoreapp2.0\Disbot.runtimeconfig.dev.json
 C:\GitHub\Disbot2\DisSharp\bin\Debug\netcoreapp2.0\Disbot.dll
 C:\GitHub\Disbot2\DisSharp\bin\Debug\netcoreapp2.0\Disbot.pdb
+C:\GitHub\Disbot2\DisSharp\bin\Debug\netcoreapp2.0\x86\e_sqlite3.dll
+C:\GitHub\Disbot2\DisSharp\bin\Debug\netcoreapp2.0\x64\e_sqlite3.dll

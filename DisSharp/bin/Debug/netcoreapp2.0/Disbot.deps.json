@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "db5f5fa609cd0dfa2f7659b8d37e6a06ebe41347"
+    "signature": "d30e2156d5d2956396fa19cd78941bbafe25bb25"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,7 +9,9 @@
       "Disbot/1.0.0": {
         "dependencies": {
           "DSharpPlus": "3.2.3",
-          "DSharpPlus.CommandsNext": "3.2.3"
+          "DSharpPlus.CommandsNext": "3.2.3",
+          "DSharpPlus.VoiceNext": "3.2.3",
+          "sqlite-net-pcl": "1.4.118"
         },
         "runtime": {
           "Disbot.dll": {}
@@ -33,6 +35,14 @@
         },
         "runtime": {
           "lib/net46/DSharpPlus.CommandsNext.dll": {}
+        }
+      },
+      "DSharpPlus.VoiceNext/3.2.3": {
+        "dependencies": {
+          "DSharpPlus": "3.2.3"
+        },
+        "runtime": {
+          "lib/netstandard2.0/DSharpPlus.VoiceNext.dll": {}
         }
       },
       "Microsoft.CSharp/4.3.0": {
@@ -194,6 +204,72 @@
             "rid": "ubuntu.16.10-x64",
             "assetType": "native"
           }
+        }
+      },
+      "sqlite-net-pcl/1.4.118": {
+        "dependencies": {
+          "SQLitePCLRaw.bundle_green": "1.1.5"
+        },
+        "runtime": {
+          "lib/netstandard1.1/SQLite-net.dll": {}
+        }
+      },
+      "SQLitePCLRaw.bundle_green/1.1.5": {
+        "dependencies": {
+          "SQLitePCLRaw.core": "1.1.5",
+          "SQLitePCLRaw.lib.e_sqlite3.linux": "1.1.5",
+          "SQLitePCLRaw.lib.e_sqlite3.osx": "1.1.5",
+          "SQLitePCLRaw.lib.e_sqlite3.v110_xp": "1.1.5",
+          "SQLitePCLRaw.provider.e_sqlite3.netstandard11": "1.1.5"
+        },
+        "runtime": {
+          "lib/netcoreapp/SQLitePCLRaw.batteries_green.dll": {},
+          "lib/netcoreapp/SQLitePCLRaw.batteries_v2.dll": {}
+        }
+      },
+      "SQLitePCLRaw.core/1.1.5": {
+        "runtime": {
+          "lib/netstandard1.1/SQLitePCLRaw.core.dll": {}
+        }
+      },
+      "SQLitePCLRaw.lib.e_sqlite3.linux/1.1.5": {
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libe_sqlite3.so": {
+            "rid": "linux-x64",
+            "assetType": "native"
+          },
+          "runtimes/linux-x86/native/libe_sqlite3.so": {
+            "rid": "linux-x86",
+            "assetType": "native"
+          }
+        }
+      },
+      "SQLitePCLRaw.lib.e_sqlite3.osx/1.1.5": {
+        "runtimeTargets": {
+          "runtimes/osx-x64/native/libe_sqlite3.dylib": {
+            "rid": "osx-x64",
+            "assetType": "native"
+          }
+        }
+      },
+      "SQLitePCLRaw.lib.e_sqlite3.v110_xp/1.1.5": {
+        "runtimeTargets": {
+          "runtimes/win7-x64/native/e_sqlite3.dll": {
+            "rid": "win7-x64",
+            "assetType": "native"
+          },
+          "runtimes/win7-x86/native/e_sqlite3.dll": {
+            "rid": "win7-x86",
+            "assetType": "native"
+          }
+        }
+      },
+      "SQLitePCLRaw.provider.e_sqlite3.netstandard11/1.1.5": {
+        "dependencies": {
+          "SQLitePCLRaw.core": "1.1.5"
+        },
+        "runtime": {
+          "lib/netstandard1.1/SQLitePCLRaw.provider.e_sqlite3.dll": {}
         }
       },
       "System.Collections/4.3.0": {
@@ -1034,6 +1110,13 @@
       "path": "dsharpplus.commandsnext/3.2.3",
       "hashPath": "dsharpplus.commandsnext.3.2.3.nupkg.sha512"
     },
+    "DSharpPlus.VoiceNext/3.2.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zQWIcDNYXKmP4u4QRdsvQS2jxmcDJbgd+8P5aF7oSv6o6XYmrZA9xjNfpyT9DbjYb0Wej3nRr9tE4cyQzae8QA==",
+      "path": "dsharpplus.voicenext/3.2.3",
+      "hashPath": "dsharpplus.voicenext.3.2.3.nupkg.sha512"
+    },
     "Microsoft.CSharp/4.3.0": {
       "type": "package",
       "serviceable": true,
@@ -1173,6 +1256,55 @@
       "sha512": "sha512-leXiwfiIkW7Gmn7cgnNcdtNAU70SjmKW3jxGj1iKHOvdn0zRWsgv/l2OJUO5zdGdiv2VRFnAsxxhDgMzofPdWg==",
       "path": "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl/4.3.2",
       "hashPath": "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512"
+    },
+    "sqlite-net-pcl/1.4.118": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-66wl2z26PpA/m+hY2UJudsHF3GpbbC8Scx9WvXC0MomQxrbclkb2jiavYsXH3AEXHsTAjKIWavmwKoRIPWsdAg==",
+      "path": "sqlite-net-pcl/1.4.118",
+      "hashPath": "sqlite-net-pcl.1.4.118.nupkg.sha512"
+    },
+    "SQLitePCLRaw.bundle_green/1.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rz+SPgp57CAWkEfCJmWqHXMd+fSqhgYmzOdjkSbCQ3OEG0I3+vUlycElvy5zTi0GAYg5pVrmRqbquotS0985CQ==",
+      "path": "sqlitepclraw.bundle_green/1.1.5",
+      "hashPath": "sqlitepclraw.bundle_green.1.1.5.nupkg.sha512"
+    },
+    "SQLitePCLRaw.core/1.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NViT1KDYnPAQo7yoYmkAMWzT15ZjqbLTSZp9iTVwZDz7fBC5fQ9TYebOFUIxYxrD/RvBpYB8m9PtcL8x/QbKNg==",
+      "path": "sqlitepclraw.core/1.1.5",
+      "hashPath": "sqlitepclraw.core.1.1.5.nupkg.sha512"
+    },
+    "SQLitePCLRaw.lib.e_sqlite3.linux/1.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BGAQOGc5/7IRTBloTs3aGKsFOQv0etSxKilvz1UirXlgOybykDw1HskJXPs4Ht6OTbREawz9j041s2SEjrEZBQ==",
+      "path": "sqlitepclraw.lib.e_sqlite3.linux/1.1.5",
+      "hashPath": "sqlitepclraw.lib.e_sqlite3.linux.1.1.5.nupkg.sha512"
+    },
+    "SQLitePCLRaw.lib.e_sqlite3.osx/1.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-27t5aO67pR9i0Sndn0s1FQebym9qhNgQqoVxohHYohQhvjrLITvJh4OdCRpiLf9E5EwLN2cmTVdO90QjgimOPw==",
+      "path": "sqlitepclraw.lib.e_sqlite3.osx/1.1.5",
+      "hashPath": "sqlitepclraw.lib.e_sqlite3.osx.1.1.5.nupkg.sha512"
+    },
+    "SQLitePCLRaw.lib.e_sqlite3.v110_xp/1.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3vMfR0vZGjGVDiS262X91NGD6yKneRem22AHV45qJr68/797ghXWVQjbGYPk9uBalZglBkaeOUXvo8fAdM+BqQ==",
+      "path": "sqlitepclraw.lib.e_sqlite3.v110_xp/1.1.5",
+      "hashPath": "sqlitepclraw.lib.e_sqlite3.v110_xp.1.1.5.nupkg.sha512"
+    },
+    "SQLitePCLRaw.provider.e_sqlite3.netstandard11/1.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tBkZ4AcES6B7kVJKFmPaNMaXO5NQNMQBGTzKwlncgfJ0PoeETYd8yDPOWbB7sb9MQNvjauBMMoUDxr79M3aosw==",
+      "path": "sqlitepclraw.provider.e_sqlite3.netstandard11/1.1.5",
+      "hashPath": "sqlitepclraw.provider.e_sqlite3.netstandard11.1.1.5.nupkg.sha512"
     },
     "System.Collections/4.3.0": {
       "type": "package",

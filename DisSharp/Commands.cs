@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using Disbot;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Newtonsoft.Json;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +16,7 @@ namespace DisSharp
     public class Commands
     {
         private static readonly int requiredReport = 2;
-        private static readonly int forceReport = 5;
+        private static readonly int forceReport = 3;
         public static List<Boss> bossList = new List<Boss>() {
             new Boss(){
                 name = "kzarka",
@@ -26,6 +28,30 @@ namespace DisSharp
         private static List<string> reporterList = new List<string>();
         private static int reportCouter = 0;
         private static int forceReportCounter = 0;
+        [Command("ขอดูรูป")]
+        public async Task test(CommandContext ctx, string keyword)
+        {
+            var imgSrc = await HTML.ImageSearch(keyword);
+            imgSrc = imgSrc.GetRange(0, 4); //get only first three images, comment this line to show all images.
+            imgSrc.ForEach(async image =>
+            {
+                try
+                {
+                    var webClient = new WebClient();
+                    var fileName = image.Substring(image.Length - 4, 4) + ".jpg";
+                    var fullPath = $@"{AppDomain.CurrentDomain.BaseDirectory}/img/{fileName}";
+                    webClient.DownloadFile(image, fullPath);
+                    using (var stream = File.OpenRead(fullPath))
+                    {
+                        await ctx.RespondWithFileAsync(stream, fileName);
+                    }
+                    File.Delete(fullPath);
+                }
+                catch (Exception ex){
+                    Console.WriteLine($@"[{DateTime.Now}]get image module causing {ex.Message}");
+                }
+            });
+        }
         [Command("gethelp")]
         public async Task Help(CommandContext ctx)
         {
@@ -37,9 +63,9 @@ namespace DisSharp
 
 !forcesetboss {boss_name} {hour} {minute} : ใช้ตั้งเวลาบอสในกรณีที่ไม่ได้ !setboss ให้ทันเวลาได้ แต่ใช้ 5 คนช่วยกันนะ (*TーT)b
 
-!hi : ทักทายกันไง! (*＾▽＾)／
+!สวัสดี : ทักทายกันไง! (*＾▽＾)／
 
-!random {min} {max} : เล่นสุ่มเลขกันหน่อยป่าว （´ヘ｀；）
+!สุ่มเลข {min} {max} : เล่นสุ่มเลขกันหน่อยป่าว （´ヘ｀；）
                 ";
             var dm = await ctx.Client.CreateDmAsync(ctx.User);
             await dm.SendMessageAsync(helpText);
@@ -84,7 +110,6 @@ namespace DisSharp
             }
 
         }
-
         private Boss GetBossByName(string bossName)
         {
             foreach (var b in bossList)
@@ -129,19 +154,20 @@ namespace DisSharp
                 }
                 await ch.SendMessageAsync(returnString);
 
-            }else
+            }
+            else
             {
                 await ctx.RespondAsync($@"หาบอสชื่อนี้ไม่เจอจ้า (-。-;");
             }
         }
-        [Command("hi")]
+        [Command("สวัสดี")]
         public async Task Hi(CommandContext ctx)
         {
             WriteLog(ctx);
             await ctx.RespondAsync($"👋 หวัดดี, {ctx.User.Mention}!");
 
         }
-        [Command("random")]
+        [Command("สุ่มเลข")]
         public async Task Random(CommandContext ctx, int min, int max)
         {
             WriteLog(ctx);

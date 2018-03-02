@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.VoiceNext;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -55,12 +56,11 @@ namespace DisSharp
                 LogLevel = BotConfig.GetContext.DebugMode,
 
             });
-            try
-            {
-                await discord.DisconnectAsync(); //try disconnect first
-            }
-            catch { }
 
+            discord.ClientErrored +=async delegate {
+                Console.WriteLine("Error Triggered");
+                await discord.ReconnectAsync();
+            };
             discord.VoiceStateUpdated += VoiceStateUpdatedEvent;
             discord.Ready += GetReady;
             discord.Heartbeated += HeartBeatedEvent;
@@ -78,11 +78,11 @@ namespace DisSharp
         {
             var creator = e.Author;
             var isCommand = e.Message.Content.Substring(0, 1) == "!";
-           // if (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID)
-           if (isCommand || (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID))
+            // if (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID)
+            if (isCommand || (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID))
             {
                 waitForDeleteMessage.Add(e.Message);
-            }          
+            }
             await Task.Delay(1);
         }
 
@@ -94,12 +94,18 @@ namespace DisSharp
                 await ch.SendMessageAsync($@"ยินดีต้อนรับกลับสู่ {ch.Guild.Channels[4].Name}, {e.User.Mention}!");
                 loggedInUser.Add(new DiscordUserStamp() { user = e.User, stamp = DateTime.Now });
             }
+
         }
 
         private static async Task GetReady(ReadyEventArgs e)
         {
+            /*
+            var vch = discord.UseVoiceNext();
+            await vch.ConnectAsync(await discord.GetChannelAsync(352734158885224448));
+            */
             var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChannelID);
             await ch.SendMessageAsync($@"{discord.CurrentUser.Mention} มาแล้ว! มีคำถามสงสัย กด !gethelp ได้เลยนะจ๊ะ d(￣◇￣)b");
+
         }
 
         private static async Task HeartBeatedEvent(HeartbeatEventArgs e)
@@ -123,14 +129,15 @@ namespace DisSharp
                 var ch = await discord.GetChannelAsync(BotConfig.GetContext.BotChannelID);
                 if (!isAlerted)
                 {
-                    await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
+                    //await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
                     isAlerted = true;
                 }
                 await discord.EditCurrentUserAsync("Kzarka [In Window]");
             }
             await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
             // remove chat
-            waitForDeleteMessage.ForEach(async m => {
+            waitForDeleteMessage.ForEach(async m =>
+            {
                 await m.DeleteAsync();
                 waitForDeleteMessage.Remove(m);
             });
