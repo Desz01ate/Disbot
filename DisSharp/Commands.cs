@@ -31,7 +31,7 @@ namespace DisSharp
         [Command("ขอดูรูป")]
         public async Task test(CommandContext ctx, string keyword)
         {
-            var imgSrc = await HTML.ImageSearch(keyword);
+            var imgSrc = await HTML.HTMLParser(keyword,HTML.Image_source);
             imgSrc = imgSrc.GetRange(0, 4); //get only first three images, comment this line to show all images.
             imgSrc.ForEach(async image =>
             {

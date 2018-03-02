@@ -9,7 +9,21 @@ namespace Disbot
 {
     static class HTML
     {
-        public static async Task<List<string>> ImageSearch(string searchingKeyword)
+        public static string Image_source
+        {
+            get
+            {
+                return "<img.+?src=[\"'](.+?)[\"'].+?>";
+            }
+        }
+        public static string A_hyperlink_reference
+        {
+            get
+            {
+                return "<a.+?href=[\"'](.+?)[\"'].+?>";
+            }
+        }
+        public static async Task<List<string>> HTMLParser(string searchingKeyword,string regexPattern = "<img.+?src=[\"'](.+?)[\"'].+?>")
         {
             var url = $@"https://www.google.co.th/search?q={searchingKeyword}&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjl0-jRz8zZAhUIjJQKHRhpAwQQ_AUICigB&biw=1065&bih=557";
             var ResultList = new List<string>();
@@ -19,7 +33,7 @@ namespace Disbot
                 HttpClient http = new HttpClient();
                 var response = await http.GetByteArrayAsync(url);
                 var source = Encoding.GetEncoding("utf-8").GetString(response, 0, response.Length - 1);
-                var result = Regex.Matches(source, "<img.+?src=[\"'](.+?)[\"'].+?>", RegexOptions.IgnoreCase);
+                var result = Regex.Matches(source,regexPattern, RegexOptions.IgnoreCase);
 
                 for (var i = 0; i < result.Count; i++)
                 {
