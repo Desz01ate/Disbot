@@ -46,5 +46,22 @@ namespace Disbot
             }
             return ResultList;
         }
+        public static async Task<string> GetUncyclopedia(string searchingKeyword)
+        {
+            var url = $@"http://th.uncyclopedia.info/wiki/{searchingKeyword}";
+            try
+            {
+                HttpClient http = new HttpClient();
+                var response = await http.GetByteArrayAsync(url);
+                var source = Encoding.GetEncoding("utf-8").GetString(response, 0, response.Length - 1);
+                if (!source.Contains("ไม่มีในไร้สาระนุกรม"))
+                    return url;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return $@"https://www.google.co.th/search?q={searchingKeyword}";
+        }
     }
 }

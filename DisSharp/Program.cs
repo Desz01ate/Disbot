@@ -57,7 +57,8 @@ namespace DisSharp
 
             });
 
-            discord.ClientErrored +=async delegate {
+            discord.ClientErrored += async delegate
+            {
                 Console.WriteLine("Error Triggered");
                 await discord.ReconnectAsync();
             };
@@ -77,7 +78,15 @@ namespace DisSharp
         private static async Task MessageCreateEvent(MessageCreateEventArgs e)
         {
             var creator = e.Author;
-            var isCommand = e.Message.Content.Substring(0, 1) == "!";
+            var isCommand = false;
+            try
+            {
+                isCommand = e.Message.Content.Substring(0, 1) == BotConfig.GetContext.CommandPrefix;
+            }
+            catch
+            {
+                Console.WriteLine($@"[{DateTime.Now}] Content is an image, skipping.");
+            }
             // if (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID)
             if (isCommand || (creator == discord.CurrentUser && e.Channel.Id == BotConfig.GetContext.TextChannelID))
             {
@@ -104,7 +113,7 @@ namespace DisSharp
             await vch.ConnectAsync(await discord.GetChannelAsync(352734158885224448));
             */
             var ch = await discord.GetChannelAsync(BotConfig.GetContext.TextChannelID);
-            await ch.SendMessageAsync($@"{discord.CurrentUser.Mention} มาแล้ว! มีคำถามสงสัย กด !gethelp ได้เลยนะจ๊ะ d(￣◇￣)b");
+            await ch.SendMessageAsync($@"{discord.CurrentUser.Mention} มาแล้ว! มีคำถามสงสัย กด !help ได้เลยนะจ๊ะ d(￣◇￣)b");
 
         }
 
@@ -113,35 +122,60 @@ namespace DisSharp
             var isExtended = false;
             var boss = Commands.bossList[0];
             var spawnTime = (boss.time.AddHours(boss.window)) - DateTime.Now;
+            var ch = await discord.GetChannelAsync(BotConfig.GetContext.BotChannelID);
             if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
             {
                 spawnTime = (boss.time.AddHours(boss.window).AddHours(boss.extend)) - DateTime.Now;
                 isExtended = true;
+                if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
+                {
+
+                    BossCalibrate(boss.name);
+                    isExtended = false;
+                    await discord.SendMessageAsync(ch, $@"@everyone ไม่มีใครรายงานเวลาเกิดบอสจนหมดรอบ 12 ชั่วโมงแล้ว ขอ Recalibrate บอสก่อนนะ ถ้ามากันแล้ว มาเซ็ทเวลาใหม่ด้วย!");
+                } //even after adding the extend still out of scope then something went wrong
             }
             var returnString = string.Empty;
             if (!isExtended)
             {
-                await discord.EditCurrentUserAsync("Kzarka [Not In Window]");
                 isAlerted = false;
             }
             else
             {
-                var ch = await discord.GetChannelAsync(BotConfig.GetContext.BotChannelID);
                 if (!isAlerted)
                 {
-                    //await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
+                    await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
                     isAlerted = true;
                 }
-                await discord.EditCurrentUserAsync("Kzarka [In Window]");
             }
-            await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
+            var prefix = isExtended ? "[*]" : string.Empty;
+            await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"{prefix}Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
             // remove chat
             waitForDeleteMessage.ForEach(async m =>
             {
-                await m.DeleteAsync();
+                try
+                {
+                    await m.DeleteAsync();
+                }
+                catch
+                {
+                    Console.WriteLine("Message is not found.");
+                }
                 waitForDeleteMessage.Remove(m);
                 await Task.Delay(300); // 3 requests per second
             });
+
+        }
+
+        private static void BossCalibrate(string name)
+        {
+            var bossIndex = Commands.bossList.FindIndex(x => { return x.name == name; });
+            var boss = Commands.bossList[bossIndex];
+            Console.WriteLine("Recalibrating...");
+            Commands.bossList[bossIndex].time = DateTime.Now;
+            File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{boss.name}.json", JsonConvert.SerializeObject(boss));
+            Console.WriteLine("Calibrated.");
+            
         }
     }
 

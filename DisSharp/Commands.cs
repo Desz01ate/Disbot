@@ -15,8 +15,6 @@ namespace DisSharp
 {
     public class Commands
     {
-        private static readonly int requiredReport = 2;
-        private static readonly int forceReport = 1;
         public static List<Boss> bossList = new List<Boss>() {
             new Boss(){
                 name = "kzarka",
@@ -25,18 +23,41 @@ namespace DisSharp
                 extend = 4
             }
         }; //would be replace if the json files is exists
-        private static List<string> reporterList = new List<string>();
-        private static int reportCouter = 0;
-        private static int forceReportCounter = 0;
+
+        [Command("กวาดบ้าน")]
+        [Description("เก็บกวาดอะไรที่มันรกหูรกตา")]
+        public async Task Cleaning(CommandContext ctx)
+        {
+            await ctx.RespondAsync("กวาดแปบ");
+            var message = await (await ctx.Client.GetChannelAsync(BotConfig.GetContext.BotChannelID)).GetMessagesAsync();
+            for (var index = 0; index < message.Count; index++)
+            {
+                await message[index].DeleteAsync();
+            }
+            await ctx.RespondAsync("เสร็จแล้ว");
+        }
+        [Command("ขอวาป")]
+        [Description("ส่งคุณไปยังที่ดีๆ ตามคำค้นที่อยากไป")]
+        public async Task GETUrl(CommandContext ctx, string keyword)
+        {
+            var URL = await HTML.GetUncyclopedia(keyword);
+            //URL = URL.GetRange(0, 4); //get only first three images, comment this line to show all images.
+            if (URL.Contains("pedia"))
+                await ctx.RespondAsync($@"ลองเข้าไปอ่าน {URL} ดู!");
+            else
+                await ctx.RespondAsync($@"คีย์เวิร์ดโคตรกาก! ไปอ่านแถวนี้ดูแล้วกัน {URL}");
+        }
         [Command("ขอดูรูป")]
+        [Description("หารูปมาให้ดูเก๋ๆ ตามคำค้นที่คุณอยากได้")]
         public async Task test(CommandContext ctx, string keyword)
         {
-            var imgSrc = await HTML.HTMLParser(keyword,HTML.Image_source);
+            var imgSrc = await HTML.HTMLParser(keyword, HTML.Image_source);
             imgSrc = imgSrc.GetRange(0, 4); //get only first three images, comment this line to show all images.
             imgSrc.ForEach(async image =>
             {
                 try
                 {
+                    /*
                     var webClient = new WebClient();
                     var fileName = image.Substring(image.Length - 4, 4) + ".jpg";
                     var fullPath = $@"{AppDomain.CurrentDomain.BaseDirectory}/img/{fileName}";
@@ -45,33 +66,20 @@ namespace DisSharp
                     {
                         await ctx.RespondWithFileAsync(stream, fileName);
                     }
-                    File.Delete(fullPath);
+                    File.Delete(fullPath);*/
+                    await ctx.RespondAsync(image);
                 }
-                catch (Exception ex){
+                catch (Exception ex)
+                {
                     Console.WriteLine($@"[{DateTime.Now}]get image module causing {ex.Message}");
                 }
             });
         }
-        [Command("gethelp")]
-        public async Task Help(CommandContext ctx)
-        {
-            WriteLog(ctx);
-            var helpText =
-@"!getboss {boss_name} : ขอดูเวลาบอสที่ต้องการได้นะ (￣ー￣)ｂ(ปิดใช้งานอยู่นะ ดูเวลาที่ข้อมูลของโอ้ทางขวาได้เลย!)
-
-!setboss {boss_name} : ตั้งเวลาบอสที่ต้องการได้ แต่ต้องใช้ 2 คนช่วยกันนะ ถึงจะตั้งได้ d(ﾟｰﾟ@)
-
-!forcesetboss {boss_name} {hour} {minute} : ใช้ตั้งเวลาบอสในกรณีที่ไม่ได้ !setboss ให้ทันเวลาได้ แต่ใช้ 5 คนช่วยกันนะ (*TーT)b
-
-!สวัสดี : ทักทายกันไง! (*＾▽＾)／
-
-!สุ่มเลข {min} {max} : เล่นสุ่มเลขกันหน่อยป่าว （´ヘ｀；）
-                ";
-            var dm = await ctx.Client.CreateDmAsync(ctx.User);
-            await dm.SendMessageAsync(helpText);
-        }
         [Command("setboss")]
-        public async Task SetBoss(CommandContext ctx, string bossName)
+        [Description("ตั้งเวลาบอสตาย ณ ปัจจุบัน หรือ เวลาที่กำหนดได้ แต่ต้องได้รับอนุญาตก่อน ถึงจะมีสิทธิ์ตั้งได้ d(ﾟｰﾟ@)")]
+        [Cooldown(1,300,CooldownBucketType.User)]
+        [RequirePermissions(DSharpPlus.Permissions.Administrator)]
+        public async Task SetBoss(CommandContext ctx, string bossName, string hour = null, string min = null)
         {
             WriteLog(ctx);
             // Is not an actual bosses
@@ -81,33 +89,36 @@ namespace DisSharp
                 await ctx.RespondAsync($"เค้าไม่รู้จักตัวนี้น้า ดูใหม่อีกที~");
                 return;
             }
-
-            // Reject duplicate reporter 
-            if (reporterList.Contains(ctx.User.Username))
+            var time = DateTime.Now;
+            if (hour != null && (int.Parse(hour) >= 0 && int.Parse(hour) <= 23) && min != null && (int.Parse(min) >= 0 && int.Parse(min) <= 59))
+                time = boss.time = DateTime.ParseExact($@"{hour.PadLeft(2, '0')}:{min.PadLeft(2, '0')}:00", "HH:mm:ss", CultureInfo.InvariantCulture);
+            boss.time = time;
+            await ctx.RespondAsync($"ตั้งเวลาเกิดให้ {boss.name} แล้วจ้ะ (*♡∀♡)");
+            bossList.ForEach(b =>
             {
-                await ctx.RespondAsync($@"อย่ารีพอตบอสซ้ำๆ สิ เดี๋ยวแบนเลย ヾ(`ヘ´)ﾉﾞ ");
-                return;
-            }
-            // Accept report
-            if (reportCouter < requiredReport && !reporterList.Contains(ctx.User.Username))
+                File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{b.name}.json", JsonConvert.SerializeObject(b));
+            });
+            return;
+            /*
+            ulong[] whiteList = JsonConvert.DeserializeObject<ulong[]>(File.ReadAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/whitelist.json"));
+            for (var i = 0; i < whiteList.Length; i++)
             {
-                reportCouter++;
-                reporterList.Add(ctx.User.Username);
-                await ctx.RespondAsync($"เค้ารอคนรายงานเพิ่มอีก {requiredReport - reportCouter} คน แล้วเดี๋ยวเค้าตั้งเวลาเกิดบอสให้น้า (─‿‿─)♡");
-            }
-            // Boss is in the list and the vote is equal to or above 5
-            if (reportCouter >= requiredReport)
-            {
-                reportCouter = 0;
-                reporterList.Clear();
-                boss.time = DateTime.Now;
-                await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} In {boss.time.AddHours(boss.window).ToString("HH:mm tt")}" });
-                await ctx.RespondAsync($"ตั้งเวลาเกิดให้ {boss.name} แล้วจ้ะ (*♡∀♡)");
-                bossList.ForEach(b =>
+                if (whiteList[i] == ctx.User.Id)
                 {
-                    File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{b.name}.json", JsonConvert.SerializeObject(b));
-                });
+                    var time = DateTime.Now;
+                    if (hour != null && (int.Parse(hour) >= 0 && int.Parse(hour) <= 23) && min != null && (int.Parse(min) >= 0 && int.Parse(min) <= 59))
+                        time = boss.time = DateTime.ParseExact($@"{hour.PadLeft(2, '0')}:{min.PadLeft(2, '0')}:00", "HH:mm:ss", CultureInfo.InvariantCulture);
+                    boss.time = time;
+                    await ctx.RespondAsync($"ตั้งเวลาเกิดให้ {boss.name} แล้วจ้ะ (*♡∀♡)");
+                    bossList.ForEach(b =>
+                    {
+                        File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{b.name}.json", JsonConvert.SerializeObject(b));
+                    });
+                    return;
+                }
             }
+            await ctx.RespondAsync($"{ctx.User.Mention} ไม่มีสิทธิ์ตั้งค่าเวลาบอสนะ ลองติดต่อ {(await ctx.Client.GetUserAsync(322051347505479681)).Mention} ดู");
+            */
 
         }
         private Boss GetBossByName(string bossName)
@@ -122,6 +133,8 @@ namespace DisSharp
             return null;
         }
         [Command("getboss")]
+        [Description("ขอดูเวลาบอสที่ต้องการได้นะ (￣ー￣)ｂ")]
+        [Cooldown(3, 600, CooldownBucketType.User)]
         public async Task GetBoss(CommandContext ctx, string bossName)
         {
             /*
@@ -145,12 +158,12 @@ namespace DisSharp
                 if (!isExtended)
                 {
                     //await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} In {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")}" });
-                    returnString = $"{ctx.User.Mention} บอส [{boss.name.ToUpper()}] จะเกิดใน {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที ก็คือ {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")} น่ะจ้ะ ♪";
+                    returnString = $"{ctx.User.Mention} บอส [{boss.name.ToUpper()}] จะ IN WINDOW ใน  {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที♪";
                 }
                 else
                 {
                     //await ctx.Client.UpdateStatusAsync(new DiscordGame() { Name = $@"{boss.name.ToUpper()} until {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")}" });
-                    returnString = $"{ctx.User.Mention} บอส [{boss.name.ToUpper()}] เหลือเวลาช่วงสุ่มเกิดในอีก {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที ก็คือ {DateTime.Now.Add(spawnTime).ToString("HH:mm tt")} น่ะจ้ะ ♪";
+                    returnString = $"{ctx.User.Mention} บอส [{boss.name.ToUpper()}] อยู่ในช่วง EXTEND WINDOW อีก {spawnTime.Hours} ชั่วโมง {spawnTime.Minutes} นาที♪";
                 }
                 await ch.SendMessageAsync(returnString);
 
@@ -161,6 +174,7 @@ namespace DisSharp
             }
         }
         [Command("สวัสดี")]
+        [Description("ทักทายกันไง! (*＾▽＾)／")]
         public async Task Hi(CommandContext ctx)
         {
             WriteLog(ctx);
@@ -168,50 +182,12 @@ namespace DisSharp
 
         }
         [Command("สุ่มเลข")]
+        [Description("เล่นสุ่มเลขกันหน่อยป่าว （´ヘ｀；")]
         public async Task Random(CommandContext ctx, int min, int max)
         {
             WriteLog(ctx);
             var rnd = new Random();
             await ctx.RespondAsync($"🎲 เราสุ่มเลขให้นาย ได้: {rnd.Next(min, max)}");
-        }
-        [Command("forcesetboss")]
-        public async Task ForceSetBoss(CommandContext ctx, string bossName, string hour, string min)
-        {
-            WriteLog(ctx);
-            // Is not an actual bosses
-            var boss = GetBossByName(bossName);
-            if (boss == null)
-            {
-                await ctx.RespondAsync($"เค้าไม่รู้จักตัวนี้น้า ดูใหม่อีกที~");
-                return;
-            }
-
-            // Reject duplicate reporter 
-            if (reporterList.Contains(ctx.User.Username))
-            {
-                await ctx.RespondAsync($@"อย่ารีพอตบอสซ้ำๆ สิ เดี๋ยวแบนเลย ヾ(`ヘ´)ﾉﾞ ");
-                return;
-            }
-
-            // Accept report
-            if (forceReportCounter < forceReport && !reporterList.Contains(ctx.User.Username))
-            {
-                forceReportCounter++;
-                reporterList.Add(ctx.User.Username);
-                await ctx.RespondAsync($"เค้ารอคนรายงานเพิ่มอีก {forceReport - forceReportCounter} คน แล้วเดี๋ยวเค้าตั้งเวลาเกิดบอสให้น้า (─‿‿─)♡");
-            }
-            // Boss is in the list and the vote is equal to or above 5
-            if (forceReportCounter >= forceReport)
-            {
-                forceReportCounter = 0;
-                reporterList.Clear();
-                boss.time = DateTime.ParseExact($@"{hour.PadLeft(2, '0')}:{min.PadLeft(2, '0')}:00", "HH:mm:ss", CultureInfo.InvariantCulture);
-                await ctx.RespondAsync($"ตั้งเวลาเกิดให้ {boss.name} แล้วจ้ะ (*♡∀♡)");
-                bossList.ForEach(b =>
-                {
-                    File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{b.name}.json", JsonConvert.SerializeObject(b));
-                });
-            }
         }
         public void WriteLog(CommandContext ctx)
         {
