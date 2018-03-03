@@ -29,7 +29,15 @@ namespace DisSharp
         public async Task Cleaning(CommandContext ctx)
         {
             await ctx.RespondAsync("กวาดแปบ");
-            var message = await (await ctx.Client.GetChannelAsync(BotConfig.GetContext.BotChannelID)).GetMessagesAsync();
+            var message = await (await ctx.Client.GetChannelAsync(BotConfig.GetContext.TextChannelID)).GetMessagesAsync();
+            for (var index = 0; index < message.Count; index++)
+            {
+                if (message[index].Author.Id == ctx.Client.CurrentUser.Id) //only delete the bot message
+                {
+                    await message[index].DeleteAsync();
+                }
+            }
+            message = await (await ctx.Client.GetChannelAsync(BotConfig.GetContext.BotChannelID)).GetMessagesAsync();
             for (var index = 0; index < message.Count; index++)
             {
                 await message[index].DeleteAsync();
@@ -99,27 +107,6 @@ namespace DisSharp
                 File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{b.name}.json", JsonConvert.SerializeObject(b));
             });
             return;
-            /*
-            ulong[] whiteList = JsonConvert.DeserializeObject<ulong[]>(File.ReadAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/whitelist.json"));
-            for (var i = 0; i < whiteList.Length; i++)
-            {
-                if (whiteList[i] == ctx.User.Id)
-                {
-                    var time = DateTime.Now;
-                    if (hour != null && (int.Parse(hour) >= 0 && int.Parse(hour) <= 23) && min != null && (int.Parse(min) >= 0 && int.Parse(min) <= 59))
-                        time = boss.time = DateTime.ParseExact($@"{hour.PadLeft(2, '0')}:{min.PadLeft(2, '0')}:00", "HH:mm:ss", CultureInfo.InvariantCulture);
-                    boss.time = time;
-                    await ctx.RespondAsync($"ตั้งเวลาเกิดให้ {boss.name} แล้วจ้ะ (*♡∀♡)");
-                    bossList.ForEach(b =>
-                    {
-                        File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/{b.name}.json", JsonConvert.SerializeObject(b));
-                    });
-                    return;
-                }
-            }
-            await ctx.RespondAsync($"{ctx.User.Mention} ไม่มีสิทธิ์ตั้งค่าเวลาบอสนะ ลองติดต่อ {(await ctx.Client.GetUserAsync(322051347505479681)).Mention} ดู");
-            */
-
         }
         private Boss GetBossByName(string bossName)
         {
@@ -173,6 +160,21 @@ namespace DisSharp
                 await ctx.RespondAsync($@"หาบอสชื่อนี้ไม่เจอจ้า (-。-;");
             }
         }
+        [Command("createboss")]
+        [Description("สร้างข้อมูลบอส อนุมัติสร้างได้เฉพาะแอดมินเท่านั้น d(ﾟｰﾟ@)")]
+        [RequirePermissions(DSharpPlus.Permissions.Administrator)]
+        public async Task CreateBoss(CommandContext ctx,string bossName,int Window,int Extend)
+        {
+            var boss = new Boss() { name = bossName, time = DateTime.Now, window = Window, extend = Extend };
+            var success = boss.CreateJSONFile();
+            if (success)
+            {
+                await ctx.RespondAsync("สร้างรายการบอสเรียบร้อยแล้วจ้า อย่าลืมตั้งเวลาให้บอสด้วยนะ");
+                bossList.Add(boss);
+                return;
+            }
+            await ctx.RespondAsync("สร้างบอสไม่สำเร็จง่า ติดต่อคนโฮสเราดูนะ");
+        }
         [Command("สวัสดี")]
         [Description("ทักทายกันไง! (*＾▽＾)／")]
         public async Task Hi(CommandContext ctx)
@@ -188,6 +190,35 @@ namespace DisSharp
             WriteLog(ctx);
             var rnd = new Random();
             await ctx.RespondAsync($"🎲 เราสุ่มเลขให้นาย ได้: {rnd.Next(min, max)}");
+        }
+        [Command("getmat")]
+        public async Task GetItems(CommandContext ctx,string itemName,int batch)
+        {
+            await ctx.RespondAsync("เดี๋ยวไปเปิดสมุดดูแปบนึงนะ");
+            var result = await ItemsDB.GetItemMaterials(itemName, batch);
+            result.ForEach(async mat => {
+                await ctx.RespondAsync(mat);
+            });
+            if(result.Count == 0)
+            {
+                await ctx.RespondAsync("บอกอะไรมา หาไม่เจออะ");
+            }
+
+        }
+        [Command("setmat")]
+        public async Task SetItems(CommandContext ctx, string builder)
+        {
+            await ctx.RespondAsync("เดี๋ยวไปหยิบปากกามาเขียนแปบนะ");
+            var result = await ItemsDB.AddItem(builder);
+            if (result == true)
+            {
+                await ctx.RespondAsync("เขียนเพิ่มรายการเรียบร้อยแล้วนะ");
+            }
+            else
+            {
+                await ctx.RespondAsync("ปากกาหมึกหมด ไว้มาใหม่ทีหลังนะ");
+            }
+
         }
         public void WriteLog(CommandContext ctx)
         {

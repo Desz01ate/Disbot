@@ -27,6 +27,7 @@ namespace DisSharp
         static List<DiscordUserStamp> loggedInUser = new List<DiscordUserStamp>();
         static List<DiscordMessage> waitForDeleteMessage = new List<DiscordMessage>();
         static bool isAlerted = false;
+        static int counter = 0;
         static void Main(string[] args)
         {
             if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}/bosses/"))
@@ -44,35 +45,50 @@ namespace DisSharp
                     Commands.bossList.Add(currentBoss);
                 }
             }
+            if (!Directory.Exists($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/"))
+            {
+                Directory.CreateDirectory($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/");
+                //File.Create($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/config.json");   
+                File.WriteAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/config.json"
+                    , JsonConvert.SerializeObject(new { Token = "Your token here", DebugMode = LogLevel.Info, BotChannelID = 0, TextChannelID = 0, CommandPrefix = "!" }));
+            }
             MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
         }
+
         static async Task MainAsync(string[] args)
         {
-            discord = new DiscordClient(new DiscordConfiguration
+            try
             {
-                Token = BotConfig.GetContext.Token,
-                TokenType = TokenType.Bot,
-                UseInternalLogHandler = true,
-                LogLevel = BotConfig.GetContext.DebugMode,
+                discord = new DiscordClient(new DiscordConfiguration
+                {
+                    Token = BotConfig.GetContext.Token,
+                    TokenType = TokenType.Bot,
+                    UseInternalLogHandler = true,
+                    LogLevel = BotConfig.GetContext.DebugMode,
 
-            });
+                });
 
-            discord.ClientErrored += async delegate
+                discord.ClientErrored += async delegate
+                {
+                    Console.WriteLine("Error Triggered");
+                    await discord.ReconnectAsync();
+                };
+                discord.VoiceStateUpdated += VoiceStateUpdatedEvent;
+                discord.Ready += GetReady;
+                discord.Heartbeated += HeartBeatedEvent;
+                discord.MessageCreated += MessageCreateEvent;
+                commands = discord.UseCommandsNext(new CommandsNextConfiguration
+                {
+                    StringPrefix = "!"
+                });
+                commands.RegisterCommands<Commands>();
+                await discord.ConnectAsync();
+                await Task.Delay(-1);
+            }
+            catch
             {
-                Console.WriteLine("Error Triggered");
-                await discord.ReconnectAsync();
-            };
-            discord.VoiceStateUpdated += VoiceStateUpdatedEvent;
-            discord.Ready += GetReady;
-            discord.Heartbeated += HeartBeatedEvent;
-            discord.MessageCreated += MessageCreateEvent;
-            commands = discord.UseCommandsNext(new CommandsNextConfiguration
-            {
-                StringPrefix = "!"
-            });
-            commands.RegisterCommands<Commands>();
-            await discord.ConnectAsync();
-            await Task.Delay(-1);
+                Console.WriteLine($@"Please config your bot credential at {AppDomain.CurrentDomain.BaseDirectory}preferences\config.json first before attempt to launch this application.");
+            }
         }
 
         private static async Task MessageCreateEvent(MessageCreateEventArgs e)
@@ -119,51 +135,60 @@ namespace DisSharp
 
         private static async Task HeartBeatedEvent(HeartbeatEventArgs e)
         {
-            var isExtended = false;
-            var boss = Commands.bossList[0];
-            var spawnTime = (boss.time.AddHours(boss.window)) - DateTime.Now;
-            var ch = await discord.GetChannelAsync(BotConfig.GetContext.BotChannelID);
-            if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
+            if(Commands.bossList.Count > 0)
             {
-                spawnTime = (boss.time.AddHours(boss.window).AddHours(boss.extend)) - DateTime.Now;
-                isExtended = true;
+                var isExtended = false;
+                var boss = Commands.bossList[0];
+                var spawnTime = (boss.time.AddHours(boss.window)) - DateTime.Now;
+                var ch = await discord.GetChannelAsync(BotConfig.GetContext.BotChannelID);
                 if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
                 {
+                    spawnTime = (boss.time.AddHours(boss.window).AddHours(boss.extend)) - DateTime.Now;
+                    isExtended = true;
+                    if (spawnTime.Hours < 0 || spawnTime.Minutes < 0)
+                    {
 
-                    BossCalibrate(boss.name);
-                    isExtended = false;
-                    await discord.SendMessageAsync(ch, $@"@everyone ไม่มีใครรายงานเวลาเกิดบอสจนหมดรอบ 12 ชั่วโมงแล้ว ขอ Recalibrate บอสก่อนนะ ถ้ามากันแล้ว มาเซ็ทเวลาใหม่ด้วย!");
-                } //even after adding the extend still out of scope then something went wrong
-            }
-            var returnString = string.Empty;
-            if (!isExtended)
-            {
-                isAlerted = false;
-            }
-            else
-            {
-                if (!isAlerted)
-                {
-                    await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
-                    isAlerted = true;
+                        BossCalibrate(boss.name);
+                        isExtended = false;
+                        await discord.SendMessageAsync(ch, $@"@everyone ไม่มีใครรายงานเวลาเกิดบอสจนหมดรอบ 12 ชั่วโมงแล้ว ขอ Recalibrate บอสก่อนนะ ถ้ามากันแล้ว มาเซ็ทเวลาใหม่ด้วย!");
+                    } //even after adding the extend still out of scope then something went wrong
                 }
+                var returnString = string.Empty;
+                if (!isExtended)
+                {
+                    isAlerted = false;
+                }
+                else
+                {
+                    if (!isAlerted)
+                    {
+                        await discord.SendMessageAsync(ch, $@"@everyone {boss.name} อยู่ในช่วงรอเกิดแล้ว!");
+                        isAlerted = true;
+                    }
+                }
+                var prefix = isExtended ? "[*]" : string.Empty;
+                await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"{prefix}Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
+                // remove chat
+                if (counter == 2)
+                {
+                    waitForDeleteMessage.ForEach(async m =>
+                    {
+                        try
+                        {
+                            await m.DeleteAsync();
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Message is not found.");
+                        }
+                        waitForDeleteMessage.Remove(m);
+                        await Task.Delay(300); // 3 requests per second
+                    });
+                    counter = 0;
+                }
+                else
+                    counter++;
             }
-            var prefix = isExtended ? "[*]" : string.Empty;
-            await discord.UpdateStatusAsync(new DiscordGame() { Name = $@"{prefix}Remaining {spawnTime.Hours.ToString().PadLeft(2, '0')} h {spawnTime.Minutes.ToString().PadLeft(2, '0')} m" });
-            // remove chat
-            waitForDeleteMessage.ForEach(async m =>
-            {
-                try
-                {
-                    await m.DeleteAsync();
-                }
-                catch
-                {
-                    Console.WriteLine("Message is not found.");
-                }
-                waitForDeleteMessage.Remove(m);
-                await Task.Delay(300); // 3 requests per second
-            });
 
         }
 

@@ -15,8 +15,8 @@ namespace DisSharp
         public ulong BotChannelID { get; set; }
         public LogLevel DebugMode { get;  set; }
         public string CommandPrefix { get; set; }
+        public string MongoDBConnectionString { get; set; }
         public static BotConfig GetContext => _botInstance;
-
         static BotConfig()
         {
             var botConfig = JsonConvert.DeserializeObject<BotConfig>(File.ReadAllText($@"{AppDomain.CurrentDomain.BaseDirectory}/preferences/config.json"));
@@ -25,6 +25,7 @@ namespace DisSharp
             _botInstance.BotChannelID = botConfig.BotChannelID;
             _botInstance.DebugMode = botConfig.DebugMode;
             _botInstance.CommandPrefix = botConfig.CommandPrefix;
+            _botInstance.MongoDBConnectionString = botConfig.MongoDBConnectionString;
         }
  
     }
